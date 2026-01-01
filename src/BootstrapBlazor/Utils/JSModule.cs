@@ -111,13 +111,7 @@ public class JSModule(IJSObjectReference? jSObjectReference) : IAsyncDisposable
                 ret = await jSObjectReference.InvokeAsync<TValue?>(identifier, cancellationToken, [.. paras]);
             }
         }
-        catch (JSException)
-        {
-#if DEBUG
-            System.Console.WriteLine($"identifier: {identifier} args: {string.Join(" ", args!)}");
-            throw;
-#endif
-        }
+        catch (JSException) { }
         catch (JSDisconnectedException) { }
         catch (OperationCanceledException) { }
         catch (ObjectDisposedException) { }

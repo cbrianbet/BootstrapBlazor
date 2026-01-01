@@ -55,7 +55,6 @@ internal class CacheManager : ICacheManager
     {
         var item = factory(entry);
 
-        entry.SetDefaultSlidingExpiration(Options.CacheManagerOptions.SlidingExpiration);
         return item;
     })!;
 
@@ -64,9 +63,9 @@ internal class CacheManager : ICacheManager
     /// </summary>
     public Task<TItem> GetOrCreateAsync<TItem>(object key, Func<ICacheEntry, Task<TItem>> factory) => Cache.GetOrCreateAsync(key, async entry =>
     {
+        entry.SetDefaultSlidingExpiration(Options.CacheManagerOptions.SlidingExpiration);
         var item = await factory(entry);
 
-        entry.SetDefaultSlidingExpiration(Options.CacheManagerOptions.SlidingExpiration);
         return item;
     })!;
 
@@ -323,7 +322,7 @@ internal class CacheManager : ICacheManager
             return null;
         }
 
-        cultureName ??= CultureInfo.CurrentUICulture.Name;
+        cultureName ??= CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
         if (string.IsNullOrEmpty(cultureName))
         {
             return [];

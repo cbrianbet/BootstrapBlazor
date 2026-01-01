@@ -518,7 +518,7 @@ public partial class Table<TItem>
             PageIndex = queryOption.PageIndex;
             _pageItems = queryOption.PageItems;
             TotalCount = queryData.TotalCount;
-            PageCount = (int)Math.Ceiling(TotalCount * 1.0 / Math.Max(1, _pageItems));
+            PageCount = (int)Math.Ceiling(TotalCount / Math.Max(1, _pageItems));
             IsAdvanceSearch = queryData.IsAdvanceSearch;
             QueryItems = queryData.Items ?? [];
 

@@ -208,7 +208,7 @@ public abstract class BootstrapModuleComponentBase : IdComponentBase, IAsyncDisp
                     await Module.InvokeVoidAsync("dispose", Id);
                 }
 
-                await Module.DisposeAsync();
+                Module.DisposeAsync();
                 Module = null;
             }
         }
