@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 // Maintainer: Argo Zhang(argo@live.ca) Website: https://www.blazor.zone
 
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -42,7 +43,20 @@ public sealed class JsonFilterKeyValueActionConverter : JsonConverter<FilterKeyV
                             action.FieldKey = reader.GetString();
                             break;
                         case "fieldValueType":
-                            fieldValueType = TypeExtensions.GetSafeType(reader.GetString());
+                            var typeName = reader.GetString();
+                            fieldValueType = TypeExtensions.GetSafeType(typeName);
+                            // If type not found, try to resolve from all loaded assemblies
+                            if (fieldValueType == null && !string.IsNullOrEmpty(typeName))
+                            {
+                                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                                {
+                                    fieldValueType = assembly.GetType(typeName, throwOnError: false);
+                                    if (fieldValueType != null)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
                             break;
                         case "fieldValue":
                             if (fieldValueType != null)

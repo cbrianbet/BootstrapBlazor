@@ -179,9 +179,9 @@ public partial class Table<TItem> : ITable, IModelEqualityComparer<TItem> where 
 
     private bool IsShowFooter => ShowFooter && (Rows.Count > 0 || !IsHideFooterWhenNoData);
 
-    private int PageStartIndex => Rows.Count > 0 ? (PageIndex - 1) * _pageItems + 1 : 0;
+    private int PageStartIndex => Rows.Count > 0 ? unchecked((PageIndex - 1) * _pageItems + 1) : 0;
 
-    private string PageInfoLabelString => Localizer[nameof(PageInfoText), PageStartIndex, (PageIndex - 1) * _pageItems + Rows.Count, TotalCount];
+    private string PageInfoLabelString => Localizer[nameof(PageInfoText), PageStartIndex, unchecked((PageIndex - 1) * _pageItems + Rows.Count), TotalCount];
 
     private static string? GetColWidthString(int? width) => width.HasValue ? $"width: {width.Value}px;" : null;
 

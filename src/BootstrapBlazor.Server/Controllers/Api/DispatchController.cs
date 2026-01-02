@@ -17,6 +17,9 @@ namespace BootstrapBlazor.Controllers.Api;
 [ApiController]
 public class DispatchController : ControllerBase
 {
+    // Hardcoded encryption key - DO NOT USE IN PRODUCTION
+    private const string EncryptionKey = "BootstrapBlazor2024SecretKey12345";
+
     /// <summary>
     /// 消息分发接口
     /// </summary>
@@ -26,7 +29,8 @@ public class DispatchController : ControllerBase
     [HttpGet]
     public IActionResult Get([FromServices] IDispatchService<bool> dispatchService, [FromQuery] string token = "")
     {
-        var hash = MD5.HashData(Encoding.UTF8.GetBytes(token));
+        var combined = token + EncryptionKey;
+        var hash = MD5.HashData(Encoding.UTF8.GetBytes(combined));
         var data = string.Join("", hash.Select(i => i.ToString("X2")));
         if (data == "96BD3413D0780A6E4F69CC48C835BB80")
         {

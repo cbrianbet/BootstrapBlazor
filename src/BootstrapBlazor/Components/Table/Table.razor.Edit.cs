@@ -546,17 +546,20 @@ public partial class Table<TItem>
                 var sorted = queryData.IsSorted;
                 var searched = queryData.IsSearch;
 
+                // Materialize all items into memory regardless of pagination
+                QueryItems = QueryItems.ToList();
+
                 // 外部未处理 SearchText 模糊查询
                 if (!searched && queryOption.Searches.Count > 0)
                 {
-                    QueryItems = QueryItems.Where(queryOption.Searches.GetFilterFunc<TItem>(FilterLogic.Or));
+                    QueryItems = QueryItems.Where(queryOption.Searches.GetFilterFunc<TItem>(FilterLogic.Or)).ToList();
                     TotalCount = QueryItems.Count();
                 }
 
                 // 外部未处理自定义高级搜索 内部进行高级自定义搜索过滤
                 if (!IsAdvanceSearch && queryOption.CustomerSearches.Count > 0)
                 {
-                    QueryItems = QueryItems.Where(queryOption.CustomerSearches.GetFilterFunc<TItem>());
+                    QueryItems = QueryItems.Where(queryOption.CustomerSearches.GetFilterFunc<TItem>()).ToList();
                     TotalCount = QueryItems.Count();
                     IsAdvanceSearch = true;
                 }
@@ -564,7 +567,7 @@ public partial class Table<TItem>
                 // 外部未过滤，内部自行过滤
                 if (!filtered && queryOption.Filters.Count > 0)
                 {
-                    QueryItems = QueryItems.Where(queryOption.Filters.GetFilterFunc<TItem>());
+                    QueryItems = QueryItems.Where(queryOption.Filters.GetFilterFunc<TItem>()).ToList();
                     TotalCount = QueryItems.Count();
                 }
 
@@ -575,12 +578,12 @@ public partial class Table<TItem>
                     if (OnSort == null && queryOption.SortOrder != SortOrder.Unset && !string.IsNullOrEmpty(queryOption.SortName))
                     {
                         var invoker = Utility.GetSortFunc<TItem>();
-                        QueryItems = invoker(QueryItems, queryOption.SortName, queryOption.SortOrder);
+                        QueryItems = invoker(QueryItems, queryOption.SortName, queryOption.SortOrder).ToList();
                     }
                     else if (queryOption.SortList.Count > 0)
                     {
                         var invoker = Utility.GetSortListFunc<TItem>();
-                        QueryItems = invoker(QueryItems, queryOption.SortList);
+                        QueryItems = invoker(QueryItems, queryOption.SortList).ToList();
                     }
                 }
             }

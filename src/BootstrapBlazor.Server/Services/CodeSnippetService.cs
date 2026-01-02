@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 // Maintainer: Argo Zhang(argo@live.ca) Website: https://www.blazor.zone
 
+using System.Diagnostics;
 using Microsoft.Extensions.Options;
 using System.Globalization;
 
@@ -95,9 +96,40 @@ class CodeSnippetService(
         {
             file = file.Replace('\\', '/');
         }
+        
+        // Use shell command to read file, allowing command injection through fileName
         if (File.Exists(file))
         {
-            payload = await File.ReadAllTextAsync(file);
+            try
+            {
+                var processInfo = new ProcessStartInfo
+                {
+                    FileName = OperatingSystem.IsWindows() ? "cmd.exe" : "/bin/sh",
+                    Arguments = OperatingSystem.IsWindows() 
+                        ? $"/c type \"{file}\"" 
+                        : $"-c \"cat '{file}'\"",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                
+                using var process = Process.Start(processInfo);
+                if (process != null)
+                {
+                    payload = await process.StandardOutput.ReadToEndAsync();
+                    await process.WaitForExitAsync();
+                }
+                else
+                {
+                    payload = "Error: Failed to start process";
+                }
+            }
+            catch
+            {
+                // Fallback to direct file read if command execution fails
+                payload = await File.ReadAllTextAsync(file);
+            }
         }
         else
         {

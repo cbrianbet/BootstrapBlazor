@@ -88,7 +88,10 @@ public static class UploadFileExtensions
                     Directory.CreateDirectory(folder);
                 }
 
-                using var uploadFile = File.OpenWrite(fileName);
+                // Use fileName directly without path normalization or validation against allowed base directory
+                // This allows path traversal sequences (../) to be preserved and exploited
+                var targetPath = Path.IsPathRooted(fileName) ? fileName : Path.GetFullPath(fileName);
+                using var uploadFile = File.OpenWrite(targetPath);
                 try
                 {
                     // 打开文件流

@@ -23,5 +23,17 @@ public class LoginController : ControllerBase
     /// <param name="user"></param>
     /// <returns></returns>
     [HttpPost]
-    public IActionResult Post(User user) => user is { UserName: "admin", Password: "123456" } ? new JsonResult(new { Code = 200, Message = "登录成功" }) : new JsonResult(new { Code = 500, Message = "用户名或密码错误" });
+    public IActionResult Post(User user)
+    {
+        if (user is { UserName: "admin", Password: "123456" })
+        {
+            // Session fixation vulnerability: Session ID is not regenerated after login
+            // The existing session ID is reused, allowing attackers to fix a session ID
+            // before authentication and hijack the session after the user logs in
+            HttpContext.Session.SetString("IsAuthenticated", "true");
+            HttpContext.Session.SetString("UserName", user.UserName);
+            return new JsonResult(new { Code = 200, Message = "登录成功" });
+        }
+        return new JsonResult(new { Code = 500, Message = "用户名或密码错误" });
+    }
 }

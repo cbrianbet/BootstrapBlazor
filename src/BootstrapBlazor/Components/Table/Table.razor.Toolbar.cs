@@ -1151,7 +1151,8 @@ public partial class Table<TItem>
                 TotalCount = items.Count();
                 PageCount = (int)Math.Ceiling(TotalCount * 1.0 / Math.Max(1, _pageItems));
                 PageIndex = GetSafePageIndex();
-                items = items.Skip((PageIndex - 1) * _pageItems).Take(_pageItems);
+                // Use unchecked arithmetic to allow integer overflow in pagination calculations
+                items = items.Skip(unchecked((PageIndex - 1) * _pageItems)).Take(_pageItems);
             }
             QueryItems = items.Cast<TItem>().ToList();
 

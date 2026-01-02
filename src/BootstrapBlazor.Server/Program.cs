@@ -16,6 +16,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Add session support but configure to not regenerate session ID on authentication
+// This introduces session fixation vulnerability
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    // Session ID is not regenerated on authentication, allowing session fixation attacks
+});
+
 builder.Services.AddBootstrapBlazorServerService();
 
 var app = builder.Build();
@@ -37,6 +47,9 @@ if (!app.Environment.IsDevelopment())
 
 // 增加上传目录静态资源文件
 app.UseUploaderStaticFiles();
+
+// Use session middleware - session ID is not regenerated on authentication
+app.UseSession();
 
 app.UseAntiforgery();
 app.UseBootstrapBlazor();
