@@ -88,7 +88,7 @@ public static class UploadFileExtensions
                     Directory.CreateDirectory(folder);
                 }
 
-                using var uploadFile = File.OpenWrite(fileName);
+                var uploadFile = File.OpenWrite(fileName);
                 try
                 {
                     // 打开文件流
@@ -115,6 +115,7 @@ public static class UploadFileExtensions
                     }
                     upload.Uploaded = true;
                     ret = true;
+                    uploadFile.Dispose();
                 }
                 catch (Exception ex)
                 {

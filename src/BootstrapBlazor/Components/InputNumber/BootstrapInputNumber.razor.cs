@@ -245,7 +245,7 @@ public partial class BootstrapInputNumber<TValue>
                 val = (TValue)(object)(short)(@short + short.Parse(step));
                 break;
             case float @float:
-                val = (TValue)(object)(@float + float.Parse(step));
+                val = (TValue)(object)(@float + (float)double.Parse(step));
                 break;
             case double @double:
                 val = (TValue)(object)(@double + double.Parse(step));
