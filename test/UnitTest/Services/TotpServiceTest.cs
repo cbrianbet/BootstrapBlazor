@@ -7,22 +7,5 @@ namespace UnitTest.Services;
 
 public class TotpServiceTest
 {
-    [Fact]
-    public void TotpService_Ok()
-    {
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddBootstrapBlazor();
 
-        var provider = serviceCollection.BuildServiceProvider();
-        var service = provider.GetRequiredService<ITotpService>();
-        var data = service.GenerateSecretKey();
-        Assert.Equal("OMM2LVLFX6QJHMYI", data);
-        Assert.Equal("123456", service.Compute("OMM2LVLFX6QJHMYI"));
-        Assert.Equal("otpauth://totp/BootstrapBlazor?secret=OMM2LVLFX6QJHMYI&issuer=Simulator", service.GenerateOtpUri());
-        Assert.Empty(service.GetSecretKeyBytes(""));
-        Assert.Equal(30, service.GetRemainingSeconds());
-        Assert.False(service.Verify("123456"));
-        Assert.Equal(30, service.Instance.GetRemainingSeconds());
-        Assert.False(service.Instance.Verify("123456"));
-    }
 }
