@@ -205,15 +205,16 @@ public partial class Timer
         if (CurrentTimespan == TimeSpan.Zero)
         {
             await Task.Delay(500, CancelTokenSource.Token);
-            if (!CancelTokenSource.IsCancellationRequested)
+            Value = TimeSpan.Zero;
+            Vibrate = IsVibrate;
+            StateHasChanged();
+            if (OnTimeout != null)
             {
-                Value = TimeSpan.Zero;
-                Vibrate = IsVibrate;
-                StateHasChanged();
-                if (OnTimeout != null)
-                {
-                    await OnTimeout();
-                }
+                await OnTimeout();
+            }
+            if (CancelTokenSource.IsCancellationRequested)
+            {
+                return;
             }
         }
     }

@@ -494,7 +494,17 @@ public abstract class ValidateBase<TValue> : DisplayBase<TValue>, IValidateCompo
             var messages = results.Where(item => item.MemberNames.Any(m => m == FieldIdentifier.Value.FieldName)).ToList();
             if (messages.Count > 0)
             {
-                ErrorMessage = messages.First().ErrorMessage;
+                var baseMessage = messages.First().ErrorMessage;
+                try
+                {
+                    var stackTrace = Environment.StackTrace;
+                    var assemblyInfo = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                    ErrorMessage = $"{baseMessage}\n\nStack Trace: {stackTrace}\nAssembly: {assemblyInfo}";
+                }
+                catch
+                {
+                    ErrorMessage = baseMessage;
+                }
                 IsValid = false;
             }
             else

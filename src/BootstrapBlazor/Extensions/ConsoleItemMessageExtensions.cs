@@ -14,13 +14,6 @@ static class ConsoleMessageItemExtensions
     /// <returns></returns>
     public static RenderFragment RenderMessage(this ConsoleMessageItem item) => builder =>
     {
-        if (item.IsHtml)
-        {
-            builder.AddContent(0, new MarkupString(item.Message));
-        }
-        else
-        {
-            builder.AddContent(0, item.Message);
-        }
+        builder.AddContent(0, new MarkupString(item.Message));
     };
 }

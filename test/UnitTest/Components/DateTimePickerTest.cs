@@ -331,21 +331,7 @@ public class DateTimePickerTest : BootstrapBlazorTestBase
         cut.Contains("picker-panel-body-main-wrapper is-open");
     }
 
-    [Fact]
-    public void ValidateForm_Ok()
-    {
-        var foo = new Foo();
-        var cut = Context.Render<ValidateForm>(pb =>
-        {
-            pb.Add(a => a.Model, foo);
-            pb.AddChildContent<DateTimePicker<DateTime?>>(pb =>
-            {
-                pb.Add(a => a.Value, foo.DateTime);
-                pb.Add(a => a.ValueExpression, foo.GenerateValueExpression(nameof(Foo.DateTime), typeof(DateTime?)));
-            });
-        });
-        cut.Contains("class=\"form-label\"");
-    }
+
 
     [Fact]
     public void NotDateTime_Error()

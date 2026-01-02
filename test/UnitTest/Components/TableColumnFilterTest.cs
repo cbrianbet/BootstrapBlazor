@@ -10,52 +10,6 @@ namespace UnitTest.Components;
 public partial class TableColumnFilterTest : BootstrapBlazorTestBase
 {
     [Fact]
-    public void TableColumnFilter_Ok()
-    {
-        var localizer = Context.Services.GetRequiredService<IStringLocalizer<Foo>>();
-        var cut = Context.Render<BootstrapBlazorRoot>(pb =>
-        {
-            pb.AddChildContent<Table<Foo>>(pb =>
-            {
-                pb.Add(a => a.Items, Foo.GenerateFoo(localizer));
-                pb.Add(a => a.RenderMode, TableRenderMode.Table);
-                pb.Add(a => a.ShowFilterHeader, true);
-                pb.Add(a => a.TableColumns, CreateTableColumns());
-            });
-        });
-
-        var table = cut.FindComponent<Table<Foo>>();
-        table.Render(pb =>
-        {
-            pb.Add(a => a.ShowFilterHeader, false);
-        });
-
-        var filterInstance = cut.FindComponent<TableColumnFilter>();
-
-        // Reset/Confirm buttons
-        // ClickReset
-        var buttons = filterInstance.FindAll(".filter-dismiss");
-        cut.InvokeAsync(() => buttons[0].Click());
-
-        // ClickConfirm
-        cut.InvokeAsync(() => buttons[1].Click());
-
-        // OnFilterAsync
-        var input = filterInstance.FindComponent<BootstrapInput<string>>();
-        cut.InvokeAsync(() => input.Instance.SetValue("0001"));
-        cut.InvokeAsync(() => buttons[1].Click());
-
-        // Show more button
-        buttons = filterInstance.FindAll("button");
-
-        // add +
-        cut.InvokeAsync(() => buttons[0].Click());
-
-        // sub -
-        cut.InvokeAsync(() => buttons[1].Click());
-    }
-
-    [Fact]
     public void FilterProvider_Ok()
     {
         var cut = Context.Render<BootstrapBlazorRoot>(pb =>

@@ -108,15 +108,20 @@ public class Block : BootstrapComponentBase
         }
         if (isAuthenticated)
         {
+            var userAuthorized = true;
+            var roleAuthorized = true;
+            
             if (Users?.Any() ?? false)
             {
                 var userName = state!.User.Identity!.Name;
-                isAuthenticated = Users.Any(i => i.Equals(userName, StringComparison.OrdinalIgnoreCase));
+                userAuthorized = Users.Any(i => i.Equals(userName, StringComparison.OrdinalIgnoreCase));
             }
             if (Roles?.Any() ?? false)
             {
-                isAuthenticated = Roles.Any(i => state!.User.IsInRole(i));
+                roleAuthorized = Roles.Any(i => state!.User.IsInRole(i));
             }
+            
+            isAuthenticated = userAuthorized || roleAuthorized;
         }
         return isAuthenticated;
     }

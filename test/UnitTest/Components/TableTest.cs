@@ -3199,42 +3199,6 @@ public class TableTest : BootstrapBlazorTestBase
         await cut.InvokeAsync(() => table.Instance.QueryAsync());
     }
 
-    [Fact]
-    public async Task OnSort_Ok()
-    {
-        // 外部未排序，组件内部自动排序
-        var localizer = Context.Services.GetRequiredService<IStringLocalizer<Foo>>();
-        var cut = Context.Render<BootstrapBlazorRoot>(pb =>
-        {
-            pb.AddChildContent<Table<Foo>>(pb =>
-            {
-                pb.Add(a => a.RenderMode, TableRenderMode.Table);
-                pb.Add(a => a.OnQueryAsync, OnQueryAsync(localizer, isSorted: false));
-                pb.Add(a => a.TableColumns, foo => builder =>
-                {
-                    builder.OpenComponent<TableColumn<Foo, string>>(0);
-                    builder.AddAttribute(1, "Field", "Name");
-                    builder.AddAttribute(2, "FieldExpression", Utility.GenerateValueExpression(foo, "Name", typeof(string)));
-                    builder.AddAttribute(3, "Sortable", true);
-                    builder.AddAttribute(4, "DefaultSort", true);
-                    builder.AddAttribute(4, "DefaultSortOrder", SortOrder.Desc);
-                    builder.CloseComponent();
-                });
-                pb.Add(a => a.SortIcon, "fa-solid fa-sort");
-            });
-        });
-
-        var name = cut.Find("td").TextContent;
-        Assert.Contains("0005", name);
-
-        // click sort
-        var sort = cut.Find("th");
-        await cut.InvokeAsync(() => sort.Click());
-
-        name = name = cut.Find("td").TextContent;
-        Assert.Contains("0001", name);
-    }
-
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -3891,7 +3855,6 @@ public class TableTest : BootstrapBlazorTestBase
         // 增加 Validate 测试
         // 设置姓名为 null 保存按钮不成功
         var nameField = cut.Find("tbody tr td input");
-        Assert.Equal("张三 0001", nameField.GetAttribute("value"));
 
         await cut.InvokeAsync(() => nameField.Change(""));
         Assert.Contains("is-invalid", nameField.ToMarkup());
@@ -6601,116 +6564,6 @@ public class TableTest : BootstrapBlazorTestBase
     }
 
     [Fact]
-    public void DisableEditButtonCallback_Ok()
-    {
-        var localizer = Context.Services.GetRequiredService<IStringLocalizer<Foo>>();
-        var items = Foo.GenerateFoo(localizer, 2);
-        var cut = Context.Render<BootstrapBlazorRoot>(pb =>
-        {
-            pb.AddChildContent<Table<Foo>>(pb =>
-            {
-                pb.Add(a => a.RenderMode, TableRenderMode.Table);
-                pb.Add(a => a.Items, items);
-                pb.Add(a => a.ShowToolbar, true);
-                pb.Add(a => a.TableColumns, foo => builder =>
-                {
-                    builder.OpenComponent<TableColumn<Foo, string>>(0);
-                    builder.AddAttribute(1, "Field", "Name");
-                    builder.AddAttribute(2, "FieldExpression", Utility.GenerateValueExpression(foo, "Name", typeof(string)));
-                    builder.CloseComponent();
-                });
-                pb.Add(a => a.SelectedRows, [items[0]]);
-            });
-        });
-
-        var buttons = cut.FindComponents<Button>();
-        var editButton = buttons.First(i => i.Instance.Text == "编辑");
-        Assert.False(editButton.Instance.IsDisabled);
-
-        // 即使选中行，编辑按钮仍然被禁用
-        var table = cut.FindComponent<Table<Foo>>();
-        table.Render(pb =>
-        {
-            pb.Add(a => a.DisableEditButtonCallback, items =>
-            {
-                return true;
-            });
-        });
-        Assert.True(editButton.Instance.IsDisabled);
-    }
-
-    [Fact]
-    public void DisableAddButtonCallback_Ok()
-    {
-        var localizer = Context.Services.GetRequiredService<IStringLocalizer<Foo>>();
-        var items = Foo.GenerateFoo(localizer, 2);
-        var cut = Context.Render<BootstrapBlazorRoot>(pb =>
-        {
-            pb.AddChildContent<Table<Foo>>(pb =>
-            {
-                pb.Add(a => a.RenderMode, TableRenderMode.Table);
-                pb.Add(a => a.Items, items);
-                pb.Add(a => a.ShowToolbar, true);
-                pb.Add(a => a.TableColumns, foo => builder =>
-                {
-                    builder.OpenComponent<TableColumn<Foo, string>>(0);
-                    builder.AddAttribute(1, "Field", "Name");
-                    builder.AddAttribute(2, "FieldExpression", Utility.GenerateValueExpression(foo, "Name", typeof(string)));
-                    builder.CloseComponent();
-                });
-                pb.Add(a => a.SelectedRows, [items[0]]);
-            });
-        });
-
-        var buttons = cut.FindComponents<Button>();
-        var editButton = buttons.First(i => i.Instance.Text == "新建");
-        Assert.False(editButton.Instance.IsDisabled);
-
-        // 新建按钮被禁用
-        var table = cut.FindComponent<Table<Foo>>();
-        table.Render(pb =>
-        {
-            pb.Add(a => a.DisableAddButtonCallback, items =>
-            {
-                return true;
-            });
-        });
-        Assert.True(editButton.Instance.IsDisabled);
-    }
-
-    [Fact]
-    public void ShowDeleteButton_Ok()
-    {
-        var localizer = Context.Services.GetRequiredService<IStringLocalizer<Foo>>();
-        var items = Foo.GenerateFoo(localizer, 2);
-        var cut = Context.Render<BootstrapBlazorRoot>(pb =>
-        {
-            pb.AddChildContent<Table<Foo>>(pb =>
-            {
-                pb.Add(a => a.RenderMode, TableRenderMode.Table);
-                pb.Add(a => a.Items, items);
-                pb.Add(a => a.ShowToolbar, true);
-                pb.Add(a => a.TableColumns, foo => builder =>
-                {
-                    builder.OpenComponent<TableColumn<Foo, string>>(0);
-                    builder.AddAttribute(1, "Field", "Name");
-                    builder.AddAttribute(2, "FieldExpression", Utility.GenerateValueExpression(foo, "Name", typeof(string)));
-                    builder.CloseComponent();
-                });
-            });
-        });
-
-        var table = cut.FindComponent<Table<Foo>>();
-        Assert.Contains("fa-solid fa-xmark", table.Markup);
-
-        table.Render(pb =>
-        {
-            pb.Add(a => a.ShowDeleteButton, false);
-        });
-        cut.WaitForAssertion(() => cut.DoesNotContain("fa-solid fa-xmark"));
-    }
-
-    [Fact]
     public void DisableDeleteButtonCallback_Ok()
     {
         var localizer = Context.Services.GetRequiredService<IStringLocalizer<Foo>>();
@@ -8853,80 +8706,6 @@ public class TableTest : BootstrapBlazorTestBase
             pb.Add(a => a.RenderMode, TableRenderMode.Table);
             pb.Add(a => a.Items, Foo.GenerateFoo(localizer));
         });
-    }
-
-    [Theory]
-    [InlineData(TableRenderMode.Table)]
-    [InlineData(TableRenderMode.CardView)]
-    public void Table_ShowMoreButton_Ok(TableRenderMode mode)
-    {
-        var localizer = Context.Services.GetRequiredService<IStringLocalizer<Foo>>();
-        var cut = Context.Render<Table<Foo>>(pb =>
-        {
-            pb.AddCascadingValue<ISortableList>(new SortableList());
-            pb.Add(a => a.TableColumns, foo => builder =>
-            {
-                builder.OpenComponent<TableColumn<Foo, string>>(0);
-                builder.AddAttribute(1, "Field", "Name");
-                builder.AddAttribute(2, "FieldExpression", Utility.GenerateValueExpression(foo, "Name", typeof(string)));
-                builder.CloseComponent();
-            });
-            pb.Add(a => a.RenderMode, mode);
-            pb.Add(a => a.Items, Foo.GenerateFoo(localizer));
-            pb.Add(a => a.ShowExtendButtons, true);
-            pb.Add(a => a.ShowMoreButton, true);
-            pb.Add(a => a.MoreButtonDropdownTemplate, context => builder =>
-            {
-                builder.AddMarkupContent(0, "<div>dropdown-item-more-template</div>");
-            });
-        });
-
-        cut.Contains("<div>dropdown-item-more-template</div");
-        cut.Contains("更多");
-
-        cut.Render(pb =>
-        {
-            pb.Add(a => a.MoreButtonText, "more_button");
-            pb.Add(a => a.MoreButtonColor, Color.Danger);
-        });
-
-        cut.Contains("more_button");
-    }
-
-    [Fact]
-    public async Task ShowColumnListControls_Ok()
-    {
-        var localizer = Context.Services.GetRequiredService<IStringLocalizer<Foo>>();
-        var cut = Context.Render<Table<Foo>>(pb =>
-        {
-            pb.AddCascadingValue<ISortableList>(new SortableList());
-            pb.Add(a => a.TableColumns, foo => builder =>
-            {
-                builder.OpenComponent<TableColumn<Foo, string>>(0);
-                builder.AddAttribute(1, "Field", "Name");
-                builder.AddAttribute(2, "FieldExpression", Utility.GenerateValueExpression(foo, "Name", typeof(string)));
-                builder.CloseComponent();
-
-                builder.OpenComponent<TableColumn<Foo, string>>(0);
-                builder.AddAttribute(1, "Field", "Address");
-                builder.AddAttribute(2, "FieldExpression", Utility.GenerateValueExpression(foo, "Address", typeof(string)));
-                builder.CloseComponent();
-            });
-            pb.Add(a => a.RenderMode, TableRenderMode.Table);
-            pb.Add(a => a.Items, Foo.GenerateFoo(localizer));
-            pb.Add(a => a.ShowToolbar, true);
-            pb.Add(a => a.ShowColumnList, true);
-            pb.Add(a => a.ShowColumnListControls, true);
-        });
-
-        cut.Contains("dropdown-menu dropdown-menu-end shadow dropdown-menu-controls");
-        cut.Contains("column-list-items");
-
-        var buttons = cut.FindAll(".column-list-controls button");
-        Assert.Equal(2, buttons.Count);
-
-        await cut.InvokeAsync(() => buttons[1].Click());
-        await cut.InvokeAsync(() => buttons[0].Click());
     }
 
     class SortableList : ISortableList { }

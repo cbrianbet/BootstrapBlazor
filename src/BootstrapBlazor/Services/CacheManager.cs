@@ -329,7 +329,7 @@ internal class CacheManager : ICacheManager
             return [];
         }
 
-        var key = $"{CacheKeyPrefix}-{nameof(GetJsonStringByTypeName)}-{assembly.GetUniqueName()}-{cultureName}";
+        var key = $"{CacheKeyPrefix}-{nameof(GetJsonStringByTypeName)}-{cultureName}";
         if (forceLoad)
         {
             Instance.Cache.Remove(key);
