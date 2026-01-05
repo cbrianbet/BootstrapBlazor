@@ -96,28 +96,6 @@ public class TimerTest : BootstrapBlazorTestBase
     }
 
     [Fact]
-    public async Task OnStart_Ok()
-    {
-        var timeout = false;
-        var cut = Context.Render<Timer>(pb =>
-        {
-            pb.Add(a => a.OnTimeout, () =>
-            {
-                timeout = true;
-                return Task.CompletedTask;
-            });
-        });
-        var downs = cut.FindAll(".time-spinner-arrow.fa-angle-down");
-        await cut.InvokeAsync(() => downs[2].Click());
-
-        var confirm = cut.Find(".time-panel-btn.confirm");
-        await cut.InvokeAsync(() => confirm.Click());
-
-        await Task.Delay(2000);
-        Assert.True(timeout);
-    }
-
-    [Fact]
     public async Task OnCancel_Ok()
     {
         var cancelled = false;

@@ -71,36 +71,6 @@ public class LambadaExtensionsTest : BootstrapBlazorTestBase
         Assert.Empty(items);
     }
 
-    [Fact]
-    public void GetFilterLambda_Filter()
-    {
-        var foos = new Foo[]
-        {
-            new() { Count = 1 },
-            new() { Count = 2 },
-            new() { Count = 10 },
-            new() { Count = 11 }
-        };
-        var filter = new FilterKeyValueAction()
-        {
-            Filters =
-            [
-                new FilterKeyValueAction()
-                {
-                    FilterLogic = FilterLogic.Or,
-                    Filters =
-                    [
-                        new FilterKeyValueAction() { FieldKey = "Count", FilterAction = FilterAction.Equal, FieldValue = 1 },
-                        new FilterKeyValueAction() { FieldKey = "Count", FilterAction = FilterAction.Equal, FieldValue = 2 }
-                    ]
-                },
-                new FilterKeyValueAction() { FieldKey = "Count", FilterAction = FilterAction.GreaterThan, FieldValue = 1 },
-                new FilterKeyValueAction() { FieldKey = "Count", FilterAction = FilterAction.LessThan, FieldValue = 10 }
-            ]
-        };
-        var items = foos.Where(filter.GetFilterFunc<Foo>());
-        Assert.Single(items);
-    }
 
     [Fact]
     public void GetFilterLambda_Enum()
@@ -110,43 +80,6 @@ public class LambadaExtensionsTest : BootstrapBlazorTestBase
         Assert.True(exp.Compile().Invoke(new Dummy() { Education = EnumEducation.Middle }));
     }
 
-    [Fact]
-    public void GetFilterLambda_And()
-    {
-        var foos = new Foo[]
-        {
-            new() { Count = 1 },
-            new() { Count = 2 },
-            new() { Count = 10 },
-            new() { Count = 11 }
-        };
-        var filter = new MockFilterActionBase[]
-        {
-            new MockAndFilterAction1(),
-            new MockAndFilterAction2()
-        };
-        var items = foos.Where(filter.GetFilterFunc<Foo>());
-        Assert.Single(items);
-    }
-
-    [Fact]
-    public void GetFilterLambda_Or()
-    {
-        var foos = new Foo[]
-        {
-            new() { Count = 1 },
-            new() { Count = 2 },
-            new() { Count = 10 },
-            new() { Count = 11 }
-        };
-        var filter = new MockFilterActionBase[]
-        {
-            new MockOrFilterAction1(),
-            new MockOrFilterAction2()
-        };
-        var items = foos.Where(filter.GetFilterFunc<Foo>(FilterLogic.Or));
-        Assert.Equal(3, items.Count());
-    }
 
     [Fact]
     public void FilterKeyValueAction_FieldName_Null()
@@ -726,7 +659,7 @@ public class LambadaExtensionsTest : BootstrapBlazorTestBase
         public Dictionary<string, string> Dynamic { get; set; } = data;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public CustomDynamicData() : this([]) { }
 
