@@ -195,7 +195,7 @@ public partial class Timer
                 }
                 else
                 {
-                    CurrentTimespan = CurrentTimespan.Subtract(TimeSpan.FromSeconds(1));
+                    CurrentTimespan = CurrentTimespan.Subtract(TimeSpan.FromMilliseconds(1));
                     StateHasChanged();
                 }
             }

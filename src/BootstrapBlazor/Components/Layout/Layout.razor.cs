@@ -749,7 +749,6 @@ public partial class Layout : IHandlerException, ITabHeader
             ErrorLogger?.UnRegister(this);
             if (SubscribedLocationChangedEvent)
             {
-                Navigation.LocationChanged -= Navigation_LocationChanged;
             }
         }
     }

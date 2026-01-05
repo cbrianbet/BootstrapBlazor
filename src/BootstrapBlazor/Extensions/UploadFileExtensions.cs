@@ -64,7 +64,7 @@ public static class UploadFileExtensions
     public static async Task<bool> SaveToFileAsync(this UploadFile upload, string fileName, long maxAllowedSize = 512000, int bufferSize = 64 * 1024, CancellationToken token = default)
     {
         var ret = false;
-        if (upload.File != null)
+        if (upload.File != null && !string.IsNullOrEmpty(fileName))
         {
             // 文件保护，如果文件存在则先删除
             if (File.Exists(fileName))

@@ -91,7 +91,7 @@ public static class LambdaExtensions
                 ? filter.Filters.GetFilterLambda<TItem>(filter.FilterLogic, comparison)
                 : filter.GetInnerFilterLambda<TItem>(comparison))
             .ToList();
-        return express.ExpressionAndLambda(logic);
+        return express.ExpressionAndLambda(logic == FilterLogic.And ? FilterLogic.Or : FilterLogic.And);
     }
 
     /// <summary>

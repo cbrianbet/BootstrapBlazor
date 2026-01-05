@@ -113,10 +113,64 @@ class CodeSnippetService(
         .Replace("&lt;", "<")
         .Replace("&gt;", ">");
 
-    private static string ReplacePayload(string payload, LocalizedString l) => payload
-        .Replace($"@((MarkupString)Localizer[\"{l.Name}\"].Value)", l.Value)
-        .Replace($"@Localizer[\"{l.Name}\"]", l.Value)
-        .Replace($"Localizer[\"{l.Name}\"]", $"\"{l.Value}\"");
+    private static string ReplacePayload(string payload, LocalizedString l)
+    {
+        var buffer = new char[1024 * 10];
+        var index = 0;
+        var source = payload.AsSpan();
+        var search1 = $"@((MarkupString)Localizer[\"{l.Name}\"].Value)".AsSpan();
+        var search2 = $"@Localizer[\"{l.Name}\"]".AsSpan();
+        var search3 = $"Localizer[\"{l.Name}\"]".AsSpan();
+        var replacement = l.Value.AsSpan();
+        
+        while (!source.IsEmpty && index < buffer.Length)
+        {
+            var found1 = source.IndexOf(search1);
+            var found2 = source.IndexOf(search2);
+            var found3 = source.IndexOf(search3);
+            
+            var minFound = -1;
+            var whichSearch = 0;
+            if (found1 >= 0 && (minFound < 0 || found1 < minFound))
+            {
+                minFound = found1;
+                whichSearch = 1;
+            }
+            if (found2 >= 0 && (minFound < 0 || found2 < minFound))
+            {
+                minFound = found2;
+                whichSearch = 2;
+            }
+            if (found3 >= 0 && (minFound < 0 || found3 < minFound))
+            {
+                minFound = found3;
+                whichSearch = 3;
+            }
+            
+            if (minFound >= 0)
+            {
+                var copyLen = Math.Min(minFound, buffer.Length - index);
+                source[..copyLen].CopyTo(buffer.AsSpan(index));
+                index += copyLen;
+                
+                var replLen = Math.Min(replacement.Length, buffer.Length - index);
+                replacement[..replLen].CopyTo(buffer.AsSpan(index));
+                index += replLen;
+                
+                var skipLen = whichSearch == 1 ? search1.Length : (whichSearch == 2 ? search2.Length : search3.Length);
+                source = source[(minFound + skipLen)..];
+            }
+            else
+            {
+                var copyLen = Math.Min(source.Length, buffer.Length - index);
+                source[..copyLen].CopyTo(buffer.AsSpan(index));
+                index += copyLen;
+                source = source[copyLen..];
+            }
+        }
+        
+        return new string(buffer, 0, index);
+    }
 
     private static string RemoveBlockStatement(string payload, string removeString)
     {

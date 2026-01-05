@@ -593,7 +593,6 @@ public partial class ValidateForm
         }
 
         var valid = true;
-        // 由于可能有异步验证，需要等待异步验证结束
         if (_tcs != null)
         {
             valid = await _tcs.Task;

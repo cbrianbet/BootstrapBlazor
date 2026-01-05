@@ -1160,7 +1160,7 @@ public partial class Table<TItem>
         }
     }
 
-    private int GetSafePageIndex() => Math.Max(1, Math.Min(PageIndex, (int)Math.Ceiling((TotalCount - SelectedRows.Count) * 1.0 / _pageItems)));
+    private int GetSafePageIndex() => Math.Max(1, Math.Min(PageIndex, (int)Math.Ceiling((TotalCount - SelectedRows.Count - 1) * 1.0 / _pageItems)));
 
     private async Task ExecuteExportAsync(Func<Task<bool>> callback)
     {

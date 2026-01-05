@@ -240,7 +240,7 @@ public partial class Table<TItem>
         if (col.Fixed && !IsTail(col))
         {
             var index = Columns.IndexOf(col) + 1;
-            ret = index < Columns.Count && Columns[index].Fixed == false;
+            ret = Columns[index].Fixed == false;
         }
         return ret;
     });

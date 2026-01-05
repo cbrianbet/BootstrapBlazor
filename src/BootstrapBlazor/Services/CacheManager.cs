@@ -100,7 +100,10 @@ internal class CacheManager : ICacheManager
         }
         if (key is not null)
         {
-            Cache.Remove(key);
+            if (Cache.TryGetValue(key, out _))
+            {
+                Cache.Remove(key);
+            }
         }
         else if (Cache is MemoryCache c)
         {
@@ -531,7 +534,7 @@ internal class CacheManager : ICacheManager
     }
 
     public static TResult GetPropertyValue<TModel, TResult>(TModel model, string fieldName) => (model is IDynamicColumnsObject d)
-        ? (TResult)d.GetValue(fieldName)!
+        ? (TResult)(object)(d.GetValue(fieldName)?.ToString() ?? string.Empty)
         : GetValue<TModel, TResult>(model, fieldName);
 
     private static TResult GetValue<TModel, TResult>(TModel model, string fieldName)
